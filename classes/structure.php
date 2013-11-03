@@ -498,6 +498,15 @@ class structure extends type_base {
         return $date;
     }
 
+    /**
+     * This return locale for windows os.
+     *
+     * @return string locale
+     */
+    public function locale_win_charset() {
+        return 'utf-8';
+    }
+
     private function isleap_solar($year) {
         /* 33-year cycles, it better matches Iranian rules */
         return (($year+16)%33+33)%33*8%33 < 8;
