@@ -30,4 +30,4 @@ $plugin->component  = 'calendartype_jalali'; // Full name of the plugin (used fo
 $plugin->release    = '1.0 for Moodle 2.6+';
 
 $plugin->dependencies = array('calendartype_gregorian' => ANY_VERSION);
-$plugin->maturity   = MATURITY_RC;
+$plugin->maturity   = MATURITY_STABLE;

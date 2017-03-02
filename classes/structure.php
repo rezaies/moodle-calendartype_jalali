@@ -14,11 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * The Jalali calendar type.
+ *
+ * @package    calendartype_jalali
+ * @copyright  2008 onwards Foodle Group {@link http://foodle.org}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace calendartype_jalali;
 use core_calendar\type_base;
+use core_calendar\type_factory;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
- * Handles calendar functions for the jalali calendar.
+ * Handles calendar functions for the Jalali calendar.
  *
  * @package calendartype_jalali
  * @copyright 2008 onwards Foodle Group {@link http://foodle.org}
@@ -211,7 +222,7 @@ class structure extends type_base {
         }
 
         if (!is_numeric($firstday)) {
-            $startingweekday = 6; // saturday
+            $startingweekday = 6; // Saturday.
         } else {
             $startingweekday = intval($firstday) % 7;
         }
@@ -240,12 +251,13 @@ class structure extends type_base {
      * @return int the number of days
      */
     public function get_num_days_in_month($year, $month) {
-        if ($month <= 6)
+        if ($month <= 6) {
             return 31;
-        elseif ($month != 12 or $this->isleap_solar($year))
+        } else if ($month != 12 or $this->isleap_solar($year)) {
             return 30;
+        }
 
-        return 29;    // $month is 12 and $year is a leap year
+        return 29;    // If $month is 12 and $year is a leap year.
     }
 
     /**
@@ -310,8 +322,8 @@ class structure extends type_base {
 
         $amstring = get_string('am', 'calendartype_jalali');
         $pmstring = get_string('pm', 'calendartype_jalali');
-        $AMstring = get_string('am_caps', 'calendartype_jalali');
-        $PMstring = get_string('pm_caps', 'calendartype_jalali');
+        $amcapsstring = get_string('am_caps', 'calendartype_jalali');
+        $pmcapsstring = get_string('pm_caps', 'calendartype_jalali');
 
         if (empty($format)) {
             $format = get_string('strftimedaydatetime', 'langconfig');
@@ -322,7 +334,7 @@ class structure extends type_base {
         }
 
         $jdate = $this->timestamp_to_date_array($time, $timezone);
-        //this is not sufficient code, change it. but it works correctly.
+        // This is not sufficient code, change it. But it works correctly.
         $format = str_replace( array(
             '%a',
             '%A',
@@ -342,11 +354,11 @@ class structure extends type_base {
             ($jdate['mon'] < 10 ? '0' : '') . $jdate['mon'],
             $jdate['year'] % 100,
             $jdate['year'],
-            ($jdate['hours'] < 12 ? $AMstring : $PMstring),
+            ($jdate['hours'] < 12 ? $amcapsstring : $pmcapsstring),
             ($jdate['hours'] < 12 ? $amstring : $pmstring)
             ), $format);
 
-        $gregoriancalendar = \core_calendar\type_factory::get_calendar_instance('gregorian');
+        $gregoriancalendar = type_factory::get_calendar_instance('gregorian');
         return $gregoriancalendar->timestamp_to_date_string($time, $format, $timezone, $fixday, $fixhour);
     }
 
@@ -360,14 +372,14 @@ class structure extends type_base {
      * @return array an array that represents the date in user time
      */
     public function timestamp_to_date_array($time, $timezone = 99) {
-        $gregoriancalendar = \core_calendar\type_factory::get_calendar_instance('gregorian');
+        $gregoriancalendar = type_factory::get_calendar_instance('gregorian');
 
         $date = $gregoriancalendar->timestamp_to_date_array($time, $timezone);
         $jdate = $this->convert_from_gregorian($date['year'], $date['mon'], $date['mday']);
 
         $date['month'] = get_string("month{$jdate['month']}", 'calendartype_jalali');
         $date['weekday'] = get_string("weekday{$date['wday']}", 'calendartype_jalali');
-        $date['yday'] = ( ($jdate['month'] > 6 ? 6 : $jdate['month'] -1) + ($jdate['month']-1) * 30) + $jdate['day'];
+        $date['yday'] = (($jdate['month'] > 6 ? 6 : $jdate['month'] - 1) + ($jdate['month'] - 1) * 30) + $jdate['day'];
         $date['year'] = $jdate['year'];
         $date['mon'] = $jdate['month'];
         $date['mday'] = $jdate['day'];
@@ -391,36 +403,36 @@ class structure extends type_base {
         $gm = $month - 1;
         $gd = $day - 1;
 
-        $g_day_no = 365*$gy+$this->div($gy+3,4)-$this->div($gy+99,100)+$this->div($gy+399,400);
+        $gdayno = 365 * $gy + $this->div($gy + 3, 4) - $this->div($gy + 99, 100) + $this->div($gy + 399, 400);
 
-        for ($i=0; $i < $gm; ++$i) {
-            $g_day_no += $this->gdaysinmonth[$i];
+        for ($i = 0; $i < $gm; ++$i) {
+            $gdayno += $this->gdaysinmonth[$i];
         }
-        if ($gm>1 && (($gy%4==0 && $gy%100!=0) || ($gy%400==0))) {
+        if ($gm > 1 && (($gy % 4 == 0 && $gy % 100 != 0) || ($gy % 400 == 0))) {
             /* leap and after Feb */
-            ++$g_day_no;
+            ++$gdayno;
         }
-        $g_day_no += $gd;
-        
-        $j_day_no = $g_day_no-79;
+        $gdayno += $gd;
 
-        $j_np = $this->div($j_day_no, 12053);
-        $j_day_no %= 12053;
+        $jdayno = $gdayno - 79;
 
-        $jy = 979+33*$j_np+4*$this->div($j_day_no,1461);
+        $jnp = $this->div($jdayno, 12053);
+        $jdayno %= 12053;
 
-        $j_day_no %= 1461;
+        $jy = 979 + 33 * $jnp + 4 * $this->div($jdayno, 1461);
 
-        if ($j_day_no >= 366) {
-            $jy += $this->div($j_day_no-1, 365);
-            $j_day_no = ($j_day_no-1)%365;
+        $jdayno %= 1461;
+
+        if ($jdayno >= 366) {
+            $jy += $this->div($jdayno - 1, 365);
+            $jdayno = ($jdayno - 1) % 365;
         }
 
-        for ($i = 0; $i < 11 && $j_day_no >= $this->jdaysinmonth[$i]; ++$i) {
-          $j_day_no -= $this->jdaysinmonth[$i];
+        for ($i = 0; $i < 11 && $jdayno >= $this->jdaysinmonth[$i]; ++$i) {
+            $jdayno -= $this->jdaysinmonth[$i];
         }
-        $jm = $i+1;
-        $jd = $j_day_no+1;
+        $jm = $i + 1;
+        $jd = $jdayno + 1;
 
         $date = array();
         $date['year'] = $jy;
@@ -444,49 +456,51 @@ class structure extends type_base {
      * @return array the converted date
      */
     public function convert_to_gregorian($year, $month, $day, $hour = 0, $minute = 0) {
-        $jy = $year-979;
-        $jm = $month-1;
-        $jd = $day-1;
+        $jy = $year - 979;
+        $jm = $month - 1;
+        $jd = $day - 1;
 
-        $j_day_no = 365*$jy + $this->div($jy, 33)*8 + $this->div($jy%33+3, 4);
-        for ($i=0; $i < $jm; ++$i)
-            $j_day_no += $this->jdaysinmonth[$i];
+        $jdayno = 365 * $jy + $this->div($jy, 33) * 8 + $this->div($jy % 33 + 3, 4);
+        for ($i = 0; $i < $jm; ++$i) {
+            $jdayno += $this->jdaysinmonth[$i];
+        }
 
-        $j_day_no += $jd;
+        $jdayno += $jd;
 
-        $g_day_no = $j_day_no+79;
+        $gdayno = $jdayno + 79;
 
-        $gy = 1600 + 400*$this->div($g_day_no, 146097); /* 146097 = 365*400 + 400/4 - 400/100 + 400/400 */
-        $g_day_no = $g_day_no % 146097;
+        $gy = 1600 + 400 * $this->div($gdayno, 146097); /* 146097 = 365*400 + 400/4 - 400/100 + 400/400 */
+        $gdayno = $gdayno % 146097;
 
         $leap = true;
-        if ($g_day_no >= 36525) /* 36525 = 365*100 + 100/4 */
-        {
-            $g_day_no--;
-            $gy += 100*$this->div($g_day_no,  36524); /* 36524 = 365*100 + 100/4 - 100/100 */
-            $g_day_no = $g_day_no % 36524;
+        if ($gdayno >= 36525) {/* 36525 = 365*100 + 100/4 */
+            $gdayno--;
+            $gy += 100 * $this->div($gdayno, 36524); /* 36524 = 365*100 + 100/4 - 100/100 */
+            $gdayno = $gdayno % 36524;
 
-            if ($g_day_no >= 365)
-                $g_day_no++;
-            else
+            if ($gdayno >= 365) {
+                $gdayno++;
+            } else {
                 $leap = false;
+            }
         }
 
-        $gy += 4*$this->div($g_day_no, 1461); /* 1461 = 365*4 + 4/4 */
-        $g_day_no %= 1461;
+        $gy += 4 * $this->div($gdayno, 1461); /* 1461 = 365*4 + 4/4 */
+        $gdayno %= 1461;
 
-        if ($g_day_no >= 366) {
+        if ($gdayno >= 366) {
             $leap = false;
 
-            $g_day_no--;
-            $gy += $this->div($g_day_no, 365);
-            $g_day_no = $g_day_no % 365;
+            $gdayno--;
+            $gy += $this->div($gdayno, 365);
+            $gdayno = $gdayno % 365;
         }
 
-        for ($i = 0; $g_day_no >= $this->gdaysinmonth[$i] + ($i == 1 && $leap); $i++)
-            $g_day_no -= $this->gdaysinmonth[$i] + ($i == 1 && $leap);
-        $gm = $i+1;
-        $gd = $g_day_no+1;
+        for ($i = 0; $gdayno >= $this->gdaysinmonth[$i] + ($i == 1 && $leap); $i++) {
+            $gdayno -= $this->gdaysinmonth[$i] + ($i == 1 && $leap);
+        }
+        $gm = $i + 1;
+        $gd = $gdayno + 1;
 
         $date = array();
         $date['year'] = $gy;
@@ -507,12 +521,27 @@ class structure extends type_base {
         return 'utf-8';
     }
 
+    /**
+     * Returns if the given year is a leap year or not.
+     *
+     * @param int $year
+     *
+     * @return bool
+     */
     private function isleap_solar($year) {
         /* 33-year cycles, it better matches Iranian rules */
-        return (($year+16)%33+33)%33*8%33 < 8;
+        return (($year + 16) % 33 + 33) % 33 * 8 % 33 < 8;
     }
 
-    private function div($a,$b) {
-        return (int) ($a / $b);
+    /**
+     * Returns the integer quotient of the division of dividend by divisor.
+     *
+     * @param int $dividend Number to be divided.
+     * @param int $divisor Number which divides the dividend.
+     *
+     * @return int
+     */
+    private function div($dividend, $divisor) {
+        return (int) ($dividend / $divisor);
     }
 }
