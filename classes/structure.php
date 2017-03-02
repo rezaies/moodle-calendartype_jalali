@@ -338,24 +338,31 @@ class structure extends type_base {
         $format = str_replace( array(
             '%a',
             '%A',
+            '%d',
+            '%j',
             '%b',
             '%B',
-            '%d',
+            '%h',
             '%m',
+            '%C',
             '%y',
             '%Y',
             '%p',
             '%P'
-        ), array($jdate['weekday'],
-            $jdate['weekday'],
-            $jdate['month'],
-            $jdate['month'],
-            (($jdate['mday'] < 10 && !$fixday) ? '0' : '') . $jdate['mday'],
-            ($jdate['mon'] < 10 ? '0' : '') . $jdate['mon'],
-            $jdate['year'] % 100,
-            $jdate['year'],
-            ($jdate['hours'] < 12 ? $amcapsstring : $pmcapsstring),
-            ($jdate['hours'] < 12 ? $amstring : $pmstring)
+        ), array(
+            $jdate['weekday'],                                                  // For %a
+            $jdate['weekday'],                                                  // %A
+            (($jdate['mday'] < 10 && !$fixday) ? '0' : '') . $jdate['mday'],    // %d
+            $jdate['month'] * 30 + $jdate['mday'] + min($jdate['month'], 6),    // %j
+            $jdate['month'],                                                    // %b
+            $jdate['month'],                                                    // %B
+            $jdate['month'],                                                    // %h
+            ($jdate['mon'] < 10 ? '0' : '') . $jdate['mon'],                    // %m
+            floor($jdate['year'] / 100),                                        // %C
+            $jdate['year'] % 100,                                               // %y
+            $jdate['year'],                                                     // %Y
+            ($jdate['hours'] < 12 ? $amcapsstring : $pmcapsstring),             // %p
+            ($jdate['hours'] < 12 ? $amstring : $pmstring)                      // and %P.
             ), $format);
 
         $gregoriancalendar = type_factory::get_calendar_instance('gregorian');
