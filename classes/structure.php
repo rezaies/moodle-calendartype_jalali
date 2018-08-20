@@ -353,7 +353,7 @@ class structure extends type_base {
             $jdate['weekday'],                                                  // For %a
             $jdate['weekday'],                                                  // %A
             (($jdate['mday'] < 10 && !$fixday) ? '0' : '') . $jdate['mday'],    // %d
-            $jdate['month'] * 30 + $jdate['mday'] + min($jdate['month'], 6),    // %j
+            sprintf('%03d', $jdate['mon'] * 30 + $jdate['mday'] + min($jdate['mon'], 6)), // %j
             $jdate['month'],                                                    // %b
             $jdate['month'],                                                    // %B
             $jdate['month'],                                                    // %h
