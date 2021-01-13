@@ -54,3 +54,4 @@ $string['weekday4'] = 'Thursday';
 $string['weekday5'] = 'Friday';
 $string['weekday6'] = 'Saturday';
 $string['pluginname'] = 'Persian calendar type';
+$string['privacy:metadata'] = 'The Persian calendar plugin does not store any personal data.';
