@@ -333,6 +333,21 @@ class structure extends type_base {
             $fixday = false;
         }
 
+        // MDL-86346 broke the calendar. We expect a string, but we may get a Mustache\RenderedString object.
+        // This is a workaround to avoid the fatal error.
+        if (is_object($time) && method_exists($time, '__toString')) {
+            $time = (string) $time;
+        }
+        // Moodle allows rubbish in input...
+        if (is_string($time) && !is_numeric($time)) {
+            debugging(
+                "Invalid time passed to timestamp_to_date_string: '{$time}'",
+                DEBUG_DEVELOPER,
+            );
+            $time = 0;
+        }
+        $time = (int) $time;
+
         $jdate = $this->timestamp_to_date_array($time, $timezone);
         // This is not sufficient code, change it. But it works correctly.
         $format = str_replace( array(

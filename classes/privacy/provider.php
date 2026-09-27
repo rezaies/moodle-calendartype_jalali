@@ -18,7 +18,7 @@
  * Privacy Subsystem implementation for calendartype_jalali.
  *
  * @package    calendartype_jalali
- * @copyright  2021 Shamim Rezaie <shamim@moodle.com>
+ * @copyright  2021 Shamim Rezaie {@link http://foodle.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -29,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Privacy Subsystem for calendartype_jalali implementing null_provider.
  *
- * @copyright  2021 Shamim Rezaie <shamim@moodle.com>
+ * @copyright  2021 Shamim Rezaie {@link http://foodle.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements \core_privacy\local\metadata\null_provider {
